@@ -17,7 +17,7 @@ from gungame.core.players.attributes import player_attributes
 from gungame.core.players.dictionary import player_dictionary
 
 # Plugin
-from .configuration import alive_only, notify, percent, play_sound
+from .configuration import alive_only, level_increase, percent, start_amount
 
 
 # =============================================================================
@@ -81,18 +81,15 @@ def _add_assist_points(game_event):
 
         points = player_assist_points[userid].pop(victim)
         current_percent = percent.get_int() / 100 or 100
-        player_dictionary[userid].assist_points += points * current_percent
-
         player = player_dictionary[userid]
-        from .configuration import level_increase, start_amount
-        amount = start_amount.get_int()
-        amount += player.level * level_increase.get_int()
-        player.chat_message(
-            'You now have {points} / {needed} points.'.format(
-                points=player.assist_points,
-                needed=amount,
+        player.assist_points += points * current_percent
+
+        required = start_amount.get_int()
+        required += player.level * level_increase.get_int()
+        if player.assist_points >= required:
+            player.chat_message(
+                'Assists:Earned',
             )
-        )
         if not player_assist_points[userid]:
             del player_assist_points[userid]
 
