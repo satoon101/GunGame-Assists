@@ -8,6 +8,7 @@
 # GunGame
 from gungame.core.commands.registration import register_command_callback
 from gungame.core.players.dictionary import player_dictionary
+from gungame.core.status import GunGameMatchStatus, GunGameStatus
 from gungame.core.weapons.groups import melee_weapons, all_grenade_weapons
 from gungame.core.weapons.manager import weapon_order_manager
 
@@ -20,6 +21,8 @@ def _redeem_assist_points_callback(index):
     from .configuration import (
         allow_win, level_increase, start_amount, skip_nade, skip_knife,
     )
+    if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
+        return
 
     player = player_dictionary.from_index(index)
     if player.level_weapon in all_grenade_weapons and not skip_nade.get_bool():

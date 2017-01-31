@@ -15,6 +15,7 @@ from players.entity import Player
 # GunGame
 from gungame.core.players.attributes import player_attributes
 from gungame.core.players.dictionary import player_dictionary
+from gungame.core.status import GunGameMatchStatus, GunGameStatus
 
 # Plugin
 from .configuration import alive_only, level_increase, percent, start_amount
@@ -44,6 +45,9 @@ def unload():
 # =============================================================================
 @Event('player_hurt')
 def _add_damage(game_event):
+    if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
+        return
+
     attacker = game_event['attacker']
     userid = game_event['userid']
     if attacker in (userid, 0):
@@ -59,6 +63,9 @@ def _add_damage(game_event):
 
 @Event('player_death')
 def _add_assist_points(game_event):
+    if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
+        return
+
     attacker = game_event['attacker']
     victim = game_event['userid']
     if victim in player_assist_points and not alive_only.get_bool():
@@ -96,6 +103,9 @@ def _add_assist_points(game_event):
 
 @Event('player_spawn')
 def _clear_player_assists(game_event):
+    if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
+        return
+
     userid = game_event['userid']
     if userid in player_assist_points:
         del player_assist_points[userid]
