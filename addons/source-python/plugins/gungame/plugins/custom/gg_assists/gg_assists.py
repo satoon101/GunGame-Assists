@@ -55,7 +55,7 @@ def _add_damage(game_event):
 
     killer = player_dictionary[attacker]
     victim = player_dictionary[userid]
-    if killer.team == victim.team:
+    if killer.team_index == victim.team_index:
         return
 
     player_assist_points[attacker][userid] += game_event['dmg_health']
