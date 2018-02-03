@@ -1,4 +1,4 @@
-# ../gungame/plugins/included/gg_assists/info.py
+# ../gungame/plugins/custom/gg_assists/info.py
 
 """Contains plugin information."""
 
