@@ -13,12 +13,15 @@ from events import Event
 from players.entity import Player
 
 # GunGame
+from gungame.core.commands.registration import command_dictionary
 from gungame.core.players.attributes import player_attributes
 from gungame.core.players.dictionary import player_dictionary
 from gungame.core.status import GunGameMatchStatus, GunGameStatus
 
 # Plugin
-from .configuration import alive_only, level_increase, percent, start_amount
+from .configuration import (
+    alive_only, level_increase, notify, percent, play_sound, start_amount,
+)
 
 
 # =============================================================================
@@ -68,15 +71,19 @@ def _add_assist_points(game_event):
 
     attacker = game_event['attacker']
     victim = game_event['userid']
+
+    # Reset the victim's assist points on death
     if victim in player_assist_points and not alive_only.get_bool():
         del player_assist_points[victim]
 
+    # Do not add assist points for kill
     if (
         attacker in player_assist_points and
         victim in player_assist_points[attacker]
     ):
         del player_assist_points[attacker][victim]
 
+    current_percent = percent.get_int() / 100 or 100
     for userid in list(player_assist_points):
         if victim not in player_assist_points[userid]:
             continue
@@ -86,17 +93,23 @@ def _add_assist_points(game_event):
         except ValueError:
             continue
 
+        # Add assist points for the current player
         points = player_assist_points[userid].pop(victim)
-        current_percent = percent.get_int() / 100 or 100
         player = player_dictionary[userid]
         player.assist_points += points * current_percent
 
+        # Notify the player if they can redeem points
         required = start_amount.get_int()
         required += player.level * level_increase.get_int()
         if player.assist_points >= required:
-            player.chat_message(
-                'Assists:Earned',
-            )
+            if notify:
+                player.chat_message(
+                    'Assists:Earned',
+                    command=command_dictionary['assists'].commands[0],
+                )
+            if play_sound:
+                player.play_sound('can_redeem_assists')
+
         if not player_assist_points[userid]:
             del player_assist_points[userid]
 
