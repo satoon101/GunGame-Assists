@@ -5,6 +5,12 @@
 # =============================================================================
 # >> IMPORTS
 # =============================================================================
+# Python
+from collections import defaultdict
+
+# Source.Python
+from listeners import OnLevelInit
+
 # GunGame
 from gungame.core.commands.registration import register_command_callback
 from gungame.core.players.dictionary import player_dictionary
@@ -14,12 +20,19 @@ from gungame.core.weapons.manager import weapon_order_manager
 
 
 # =============================================================================
+# >> GLOBAL VARIABLES
+# =============================================================================
+_redeem_usage = defaultdict(int)
+
+
+# =============================================================================
 # >> FUNCTIONS
 # =============================================================================
 @register_command_callback('assists', 'Assists:Command')
 def _redeem_assist_points_callback(index):
     from .configuration import (
         allow_win, level_increase, start_amount, skip_nade, skip_knife,
+        use_increase
     )
     if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
         return
@@ -53,6 +66,7 @@ def _redeem_assist_points_callback(index):
 
     amount = start_amount.get_int()
     amount += player.level * level_increase.get_int()
+    amount += _redeem_usage[player.userid] * use_increase.get_int()
 
     if amount > player.assist_points:
         player.chat_message(
@@ -72,9 +86,16 @@ def _redeem_assist_points_callback(index):
         )
         return
 
+    _redeem_usage[player.userid] += 1
     player.chat_message(
         message='Assists:Redeemed',
         index=player.index,
         points=amount,
     )
     player.assist_points -= amount
+
+
+@OnLevelInit
+def _reset_redeem_usage(map_name):
+    """Reset the redeem usage dictionary."""
+    _redeem_usage.clear()
