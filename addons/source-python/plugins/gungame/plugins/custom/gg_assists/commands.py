@@ -30,6 +30,7 @@ _redeem_usage = defaultdict(int)
 # =============================================================================
 @register_command_callback('assists', 'Assists:Command')
 def _redeem_assist_points_callback(index):
+    # pylint: disable=import-outside-toplevel
     from .configuration import (
         allow_win, level_increase, start_amount, skip_nade, skip_knife,
         use_increase
@@ -97,5 +98,5 @@ def _redeem_assist_points_callback(index):
 
 @OnLevelInit
 def _reset_redeem_usage(map_name):
-    """Reset the redeem usage dictionary."""
+    """Reset the dictionary."""
     _redeem_usage.clear()

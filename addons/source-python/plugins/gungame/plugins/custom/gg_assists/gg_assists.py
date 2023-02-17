@@ -108,7 +108,7 @@ def _add_assist_points(game_event):
                     command=command_dictionary['assists'].commands[0],
                 )
             if play_sound:
-                player.play_sound('can_redeem_assists')
+                player.play_gg_sound('can_redeem_assists')
 
         if not player_assist_points[userid]:
             del player_assist_points[userid]
