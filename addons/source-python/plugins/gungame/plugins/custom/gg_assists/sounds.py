@@ -8,11 +8,10 @@
 # GunGame
 from gungame.core.sounds.manager import sound_manager
 
-
 # =============================================================================
 # >> SOUND REGISTRATION
 # =============================================================================
 sound_manager.register_sound(
-    sound_name='can_redeem_assists',
-    default='buttons/weapon_confirm.wav',
+    sound_name="can_redeem_assists",
+    default="buttons/weapon_confirm.wav",
 )

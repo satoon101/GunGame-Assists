@@ -15,9 +15,8 @@ from listeners import OnLevelInit
 from gungame.core.commands.registration import register_command_callback
 from gungame.core.players.dictionary import player_dictionary
 from gungame.core.status import GunGameMatchStatus, GunGameStatus
-from gungame.core.weapons.groups import melee_weapons, all_grenade_weapons
+from gungame.core.weapons.groups import all_grenade_weapons, melee_weapons
 from gungame.core.weapons.manager import weapon_order_manager
-
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -28,12 +27,15 @@ _redeem_usage = defaultdict(int)
 # =============================================================================
 # >> FUNCTIONS
 # =============================================================================
-@register_command_callback('assists', 'Assists:Command')
+@register_command_callback("assists", "Assists:Command")
 def _redeem_assist_points_callback(index):
-    # pylint: disable=import-outside-toplevel
     from .configuration import (
-        allow_win, level_increase, start_amount, skip_nade, skip_knife,
-        use_increase
+        allow_win,
+        level_increase,
+        skip_knife,
+        skip_nade,
+        start_amount,
+        use_increase,
     )
     if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
         return
@@ -41,7 +43,7 @@ def _redeem_assist_points_callback(index):
     player = player_dictionary.from_index(index)
     if player.level_weapon in all_grenade_weapons and not skip_nade.get_bool():
         player.chat_message(
-            message='Assists:Denied:Level',
+            message="Assists:Denied:Level",
             index=player.index,
             weapon=player.level_weapon,
         )
@@ -49,7 +51,7 @@ def _redeem_assist_points_callback(index):
 
     if player.level_weapon in melee_weapons and not skip_knife.get_bool():
         player.chat_message(
-            message='Assists:Denied:Level',
+            message="Assists:Denied:Level",
             index=player.index,
             weapon=player.level_weapon,
         )
@@ -60,7 +62,7 @@ def _redeem_assist_points_callback(index):
         and not allow_win.get_bool()
     ):
         player.chat_message(
-            message='Assists:Denied:Win',
+            message="Assists:Denied:Win",
             index=player.index,
         )
         return
@@ -71,7 +73,7 @@ def _redeem_assist_points_callback(index):
 
     if amount > player.assist_points:
         player.chat_message(
-            message='Assists:Denied:Points',
+            message="Assists:Denied:Points",
             index=player.index,
             current=player.assist_points,
             required=amount,
@@ -79,17 +81,17 @@ def _redeem_assist_points_callback(index):
         return
 
     current = player.level
-    player.increase_level(1, 'assists')
+    player.increase_level(1, "assists")
     if player.level <= current:
         player.chat_message(
-            message='Assists:Failed',
+            message="Assists:Failed",
             index=player.index,
         )
         return
 
     _redeem_usage[player.userid] += 1
     player.chat_message(
-        message='Assists:Redeemed',
+        message="Assists:Redeemed",
         index=player.index,
         points=amount,
     )

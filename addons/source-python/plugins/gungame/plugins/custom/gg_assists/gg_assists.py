@@ -20,9 +20,13 @@ from gungame.core.status import GunGameMatchStatus, GunGameStatus
 
 # Plugin
 from .configuration import (
-    alive_only, level_increase, notify, percent, play_sound, start_amount,
+    alive_only,
+    level_increase,
+    notify,
+    percent,
+    play_sound,
+    start_amount,
 )
-
 
 # =============================================================================
 # >> GLOBAL VARIABLES
@@ -35,24 +39,24 @@ player_assist_points = defaultdict(lambda: defaultdict(int))
 # =============================================================================
 def load():
     """Add the player assist attribute."""
-    player_attributes.register_attribute('assist_points', 0)
+    player_attributes.register_attribute("assist_points", 0)
 
 
 def unload():
     """Remove the player assist attribute."""
-    player_attributes.unregister_attribute('assist_points')
+    player_attributes.unregister_attribute("assist_points")
 
 
 # =============================================================================
 # >> GAME EVENTS
 # =============================================================================
-@Event('player_hurt')
+@Event("player_hurt")
 def _add_damage(game_event):
     if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
         return
 
-    attacker = game_event['attacker']
-    userid = game_event['userid']
+    attacker = game_event["attacker"]
+    userid = game_event["userid"]
     if attacker in (userid, 0):
         return
 
@@ -61,19 +65,20 @@ def _add_damage(game_event):
     if killer.team_index == victim.team_index:
         return
 
-    player_assist_points[attacker][userid] += game_event['dmg_health']
+    player_assist_points[attacker][userid] += game_event["dmg_health"]
 
 
-@Event('player_death')
+# ruff: noqa: C901
+@Event("player_death")
 def _add_assist_points(game_event):
     if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
         return
 
-    attacker = game_event['attacker']
-    victim = game_event['userid']
+    attacker = game_event["attacker"]
+    victim = game_event["userid"]
 
     # Reset the victim's assist points on death
-    if victim in player_assist_points and not alive_only.get_bool():
+    if victim in player_assist_points and alive_only.get_bool():
         del player_assist_points[victim]
 
     # Do not add assist points for kill
@@ -104,21 +109,21 @@ def _add_assist_points(game_event):
         if player.assist_points >= required:
             if notify:
                 player.chat_message(
-                    'Assists:Earned',
-                    command=command_dictionary['assists'].commands[0],
+                    "Assists:Earned",
+                    command=command_dictionary["assists"].commands[0],
                 )
             if play_sound:
-                player.play_gg_sound('can_redeem_assists')
+                player.play_gg_sound("can_redeem_assists")
 
         if not player_assist_points[userid]:
             del player_assist_points[userid]
 
 
-@Event('player_spawn')
+@Event("player_spawn")
 def _clear_player_assists(game_event):
     if GunGameStatus.MATCH is not GunGameMatchStatus.ACTIVE:
         return
 
-    userid = game_event['userid']
+    userid = game_event["userid"]
     if userid in player_assist_points:
         del player_assist_points[userid]
