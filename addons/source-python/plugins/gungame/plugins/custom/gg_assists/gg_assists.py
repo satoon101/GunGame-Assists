@@ -78,7 +78,7 @@ def _add_assist_points(game_event):
     victim = game_event["userid"]
 
     # Reset the victim's assist points on death
-    if victim in player_assist_points and alive_only.get_bool():
+    if victim in player_assist_points and bool(alive_only):
         del player_assist_points[victim]
 
     # Do not add assist points for kill
@@ -88,7 +88,7 @@ def _add_assist_points(game_event):
     ):
         del player_assist_points[attacker][victim]
 
-    current_percent = percent.get_int() / 100 or 100
+    current_percent = int(percent) / 100 or 100
     for userid in list(player_assist_points):
         if victim not in player_assist_points[userid]:
             continue
@@ -104,8 +104,8 @@ def _add_assist_points(game_event):
         player.assist_points += points * current_percent
 
         # Notify the player if they can redeem points
-        required = start_amount.get_int()
-        required += player.level * level_increase.get_int()
+        required = int(start_amount)
+        required += player.level * int(level_increase)
         if player.assist_points >= required:
             if notify:
                 player.chat_message(

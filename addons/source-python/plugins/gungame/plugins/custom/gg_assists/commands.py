@@ -41,7 +41,7 @@ def _redeem_assist_points_callback(index):
         return
 
     player = player_dictionary.from_index(index)
-    if player.level_weapon in all_grenade_weapons and not skip_nade.get_bool():
+    if player.level_weapon in all_grenade_weapons and not bool(skip_nade):
         player.chat_message(
             message="Assists:Denied:Level",
             index=player.index,
@@ -49,7 +49,7 @@ def _redeem_assist_points_callback(index):
         )
         return
 
-    if player.level_weapon in melee_weapons and not skip_knife.get_bool():
+    if player.level_weapon in melee_weapons and not bool(skip_knife):
         player.chat_message(
             message="Assists:Denied:Level",
             index=player.index,
@@ -59,7 +59,7 @@ def _redeem_assist_points_callback(index):
 
     if (
         player.level == weapon_order_manager.max_levels
-        and not allow_win.get_bool()
+        and not bool(allow_win)
     ):
         player.chat_message(
             message="Assists:Denied:Win",
@@ -67,9 +67,9 @@ def _redeem_assist_points_callback(index):
         )
         return
 
-    amount = start_amount.get_int()
-    amount += player.level * level_increase.get_int()
-    amount += _redeem_usage[player.userid] * use_increase.get_int()
+    amount = int(start_amount)
+    amount += player.level * int(level_increase)
+    amount += _redeem_usage[player.userid] * int(use_increase)
 
     if amount > player.assist_points:
         player.chat_message(
